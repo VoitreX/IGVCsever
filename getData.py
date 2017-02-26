@@ -48,50 +48,60 @@ class EDGE():
 		return "**ID:"+str(self.id)+" IDA:"+str(self.ida)+" IDB:"+str(self.idb)+" Direction:"+str(self.direction)+"**"
 
 class GRAPH():
-	def __init__(self, edges, points):
+   def __init__(self, edges, points):
 		self.edges=edges
 		self.points=pointsi
 
-	def getEdge(self, edgeIndex):
+   def getEdge(self, edgeIndex):
 		return self.edges[edgeIndex]
-	def getPoint(self, pointIndex):
+   def getPoint(self, pointIndex):
 		return self.points[pointIndex]
 
-	#def edit_edge(self, num):
-	#	pass
+   def edit_edge(self, edgeIndeX, Newdirection, Newweight):
+      edit_e = self.edges[edgeIndex]
+      edit_e.direction = Newdirection
+      edit_e.weight = Newweight
+
+      #edit on server   		i
+      Graphdb.query("UPDATE pathing.edges SET direction = %d WHERE id = %d", (Newdirection, edgeIndex) )
 	
-	def edit_point(self, pointIndex, long, lat, elev):
-		edit_p = self.points[pointIndex]
-		edit_p.longitude = long
-		edit_p.latitude = lat
-		edit_p.elevation = elev
-		
+   def edit_edge_weight(self, pointIndex, Newweight):
+      edit_e = self.edges[pointIndex]
+      edit_e.weight = Newweight
+      
+
+   def edit_point(self, pointIndex, long, lat, elev):
+   	edit_p = self.points[pointIndex]
+   	edit_p.longitude = long
+   	edit_p.latitude = lat
+   	edit_p.elevation = elev
+	   #MIGHT CHANGE WEIGHT TAKE CONSIDERATION	
 
 		#edit server side too
-		Graphdb.query("UPDATE pathing.points SET longitude = %3.12f , latitude = %3.12f , elevation = %3.12f WHERE id = %d", (long, lat, elev, pointIndex) )
+   	Graphdb.query("UPDATE pathing.points SET longitude = %3.12f , latitude = %3.12f , elevation = %3.12f WHERE id = %d", (long, lat, elev, pointIndex) )
 
 	
-	def rm_edge(self, edgeIndex):
-		rm_e = self.edges[edgeIndex]
+   def rm_edge(self, edgeIndex):
+   	rm_e = self.edges[edgeIndex]
 		
-		rm_ida = rm_e.ida
-		rm_idb = rm_e.idb
+   	rm_ida = rm_e.ida
+   	rm_idb = rm_e.idb
 
-		rm_ida.edges.remove(rm_e)
-		rm_idb.edges.remove(rm_e)
+   	rm_ida.edges.remove(rm_e)
+   	rm_idb.edges.remove(rm_e)
 		#will need to remove edge from data base too
-		Graphdb.query("DELETE FROM pathing.edges WHERE id = %d", (edgeIndex))
-		del self.edges[edgeIndex]
+   	Graphdb.query("DELETE FROM pathing.edges WHERE id = %d", (edgeIndex))
+   	del self.edges[edgeIndex]
 
-	def rm_point(self, pointIndex):
-		rm_p = self.points[pointIndex]
+   def rm_point(self, pointIndex):
+   	rm_p = self.points[pointIndex]
 		
-		for ed in rm_p.edges:
-			self.rm_edge(ed.id)
+   	for ed in rm_p.edges:
+   		self.rm_edge(ed.id)
 
 		#will need to remove edge from data base too
-		Graphdb.query("DELETE FROM pathing.points WHERE id = %d", (pointIndex))
-		del self.Points[pointIndex]
+   	Graphdb.query("DELETE FROM pathing.points WHERE id = %d", (pointIndex))
+   	del self.Points[pointIndex]
 
 for p in rawpoints:
 	dictPoints[p[0]]=POINT(p[0],p[1],p[2],p[3])
